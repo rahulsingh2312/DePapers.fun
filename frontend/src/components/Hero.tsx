@@ -1,36 +1,75 @@
 'use client'
 import { SiSolana } from "react-icons/si";
 import ConnectWallet from "./ConnectWallet";
-import { Toaster, toast } from "sonner";
+import { toast } from "sonner";
 
 import {
   Dialog,
   DialogPanel,
   DialogTitle,
-  DialogBackdrop,
   DialogDescription,
 } from "@headlessui/react";
 import Image from "next/image";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Keypair } from "@solana/web3.js";
+import { FirebaseApp, initializeApp } from "firebase/app";
+import { getFirestore, collection, addDoc, Firestore } from "firebase/firestore";
+
+// Firebase configuration - replace with your own config
+const firebaseConfig = {
+  apiKey: "AIzaSyDhvKhGhNXY_J-YDVjP6HXL_XZLKMTpK9Q",
+  authDomain: "tradesync-7507f.firebaseapp.com",
+  databaseURL: "https://tradesync-7507f-default-rtdb.firebaseio.com",
+  projectId: "tradesync-7507f",
+  storageBucket: "tradesync-7507f.firebasestorage.app",
+  messagingSenderId: "629393996092",
+  appId: "1:629393996092:web:492876e344e37c89c98639",
+  measurementId: "G-2RVVPRS2RF"
+};
+
+// Initialize Firebase (outside component to prevent multiple initializations)
+let app: FirebaseApp | null = null;
+let db: Firestore | null = null;
+
+// Initialize Firebase once
+try {
+  app = initializeApp(firebaseConfig);
+  db = getFirestore(app);
+  console.log("Firebase initialized");
+} catch (error) {
+  console.error("Firebase initialization error:", error);
+}
+
 const Hero = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [firestoreDb, setFirestoreDb] = useState<Firestore | null>(null);
+  
+  // Set the Firestore instance once on mount
+  useEffect(() => {
+    if (db) {
+      setFirestoreDb(db);
+    } else {
+      // Try to initialize again if it failed the first time
+      try {
+        app = initializeApp(firebaseConfig);
+        db = getFirestore(app);
+        setFirestoreDb(db);
+        console.log("Firebase initialized in component");
+      } catch (error) {
+        console.error("Firebase initialization error in component:", error);
+        toast.error("Failed to initialize database. Some features may not work properly.");
+      }
+    }
+  }, []);
 
-  const handleConfirm = () => {
-    setIsModalOpen(false);
-    console.log("Creating GoFundMe token...");
-    // Replace this with your actual token creation logic
-  };
   return (
     <main className="p-10">
         <div className="flex items-center w-fit">
         <h1 className="text-9xl max-md:text-8xl max-sm:text-6xl font-light bg-gradient-to-br from-black to-[#966300]  bg-clip-text text-transparent">
         Tokenize <br/>Unpublished Papers
-
         </h1>
         <SiSolana className="text-[#966300]" />
-
         </div>
 
         <div className="mt-6 flex items-center justify-center gap-6 w-fit">
@@ -38,23 +77,20 @@ const Hero = () => {
              onClick={() => setIsModalOpen(true)}
             src="/publishPaper.png" width={150} height={100} className="select-none hover:invert cursor-pointer transition-all hover:translate-y-2" draggable="false" alt="" />
             <ConnectWallet  />
-
         </div>
         <ConsentModal
               isOpen={isModalOpen}
               onClose={() => setIsModalOpen(false)}
-              // onConfirm={handleConfirm}
+              firestoreDb={firestoreDb}
             />
     </main>
   )
 }
 
-
-
 export default Hero
 
 
-const ConsentModal = ({ isOpen, onClose }) => {
+const ConsentModal = ({ isOpen, onClose, firestoreDb }) => {
   const { publicKey, signTransaction, connected } = useWallet();
   const [error, setError] = useState("");
 
@@ -148,123 +184,220 @@ const ConsentModal = ({ isOpen, onClose }) => {
       if (formState.website) formData.append("website", formState.website);
       
       formData.append("showName", "true");
-
+  
       const metadataResponse = await fetch("https://pump.fun/api/ipfs", {
         method: "POST",
         body: formData,
       });
-
+  
       if (!metadataResponse.ok) {
-        throw new Error("Failed to upload image to IPFS");
+        const errorText = await metadataResponse.text();
+        console.error("IPFS upload error:", errorText);
+        throw new Error(`Failed to upload image to IPFS: ${errorText.substring(0, 100)}`);
       }
-
+  
       const metadataResponseJSON = await metadataResponse.json();
+      
+      // Log the response for debugging
+      console.log("IPFS Upload Response:", metadataResponseJSON);
+      
+      // Check for required fields
+      if (!metadataResponseJSON.metadataUri) {
+        console.error("Missing metadataUri in response:", metadataResponseJSON);
+        throw new Error("Incomplete response from IPFS service");
+      }
+      
+      // If imageUri is missing but we have a filename, try to construct it
+      if (!metadataResponseJSON.imageUri && metadataResponseJSON.filename) {
+        console.warn("imageUri missing, attempting to construct from filename");
+        metadataResponseJSON.imageUri = `https://pump.fun/ipfs/${metadataResponseJSON.filename}`;
+      }
+      
       return metadataResponseJSON;
     } catch (error) {
       console.error("Error uploading image:", error);
-      throw new Error("Failed to upload image: " + error.message);
+      throw new Error(`Failed to upload image: ${error.message}`);
     } finally {
       setIsUploading(false);
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    // Validate form first
-    if (!validateForm()) {
-      return;
+
+  interface TokenData {
+    name: string;
+    symbol: string;
+    description: string;
+    imageUrl: string;
+    metadataUrl: string;
+    mintAddress: string;
+    transactionSignature: string;
+    creatorWallet: string;
+    createdAt: string;
+    twitter?: string | null;
+    telegram?: string | null;
+    website?: string | null;
+  }
+
+  const saveTokenToFirebase = async (tokenData: TokenData) => {
+    if (!firestoreDb) {
+      console.error("Firebase DB not initialized");
+      toast.error("Unable to save token data: Database not initialized");
+      return false;
     }
     
-    if (!connected || !publicKey) {
-      toast.error("Please connect your wallet first");
-      return;
-    }
-
-    toast.info("Uploading image and creating your token...");
-
     try {
-      // Upload image and get metadata
-      const metadataResponse = await uploadImageToIPFS();
-      if (!metadataResponse) {
-        throw new Error("Failed to create metadata");
-      }
-
-      const mintKeypair = Keypair.generate();
-
-      const response = await fetch("https://pumpportal.fun/api/trade-local", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          publicKey: publicKey.toString(),
-          action: "create",
-          tokenMetadata: {
-            name: metadataResponse.metadata.name,
-            symbol: metadataResponse.metadata.symbol,
-            uri: metadataResponse.metadataUri
-          },
-          mint: mintKeypair.publicKey.toString(),
-          denominatedInSol: "true",
-          amount: formState.amount,
-          slippage: formState.slippage,
-          priorityFee: formState.priorityFee,
-          pool: "pump",
-        }),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Failed to generate transaction: ${errorText}`);
-      }
-      
-      const txData = await response.arrayBuffer();
-      const tx = (
-        await import("@solana/web3.js")
-      ).VersionedTransaction.deserialize(new Uint8Array(txData));
-
-      tx.sign([mintKeypair]);
-      const signedTx = await signTransaction(tx);
-
-      const connection = new (await import("@solana/web3.js")).Connection(
-        "https://mainnet.helius-rpc.com/?api-key=fb5ef076-69e7-4d96-82d8-2237c13aef7a",
-        "confirmed"
-      );
-      
-      try {
-        const signature = await connection.sendRawTransaction(
-          signedTx.serialize()
-        );
-        
-        console.log("Transaction signature:", signature);
-        
-        // Close the modal first
-        onClose();
-        
-        // Show success toast
-        toast.success("Token created successfully!");
-        
-        // No need to reload the page - let the success message show
-      } catch (txError) {
-        // Try to get the logs if available
-        const logs = txError.logs || [];
-        console.error("Transaction logs:", logs);
-        
-        // Check for specific error messages
-        if (logs.some(log => log.includes("Symbol too long"))) {
-          throw new Error("Symbol too long. Please use 10 characters or less.");
-        } else {
-          throw txError;
-        }
-      }
-    } catch (err) {
-      console.error("Error:", err);
-      toast.error(`Error: ${err.message}`);
-      setError(err.message);
+      const docRef = await addDoc(collection(firestoreDb, "tokens"), tokenData);
+      console.log("Token saved to Firebase with ID: ", docRef.id);
+      return docRef.id;
+    } catch (error) {
+      console.error("Error saving to Firebase:", error);
+      toast.error("Failed to save token data to database");
+      return false;
     }
   };
 
+
+  // In the handleSubmit function, update the tokenData creation part:
+
+const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+  
+  // Validate form first
+  if (!validateForm()) {
+    return;
+  }
+  
+  if (!connected || !publicKey) {
+    toast.error("Please connect your wallet first");
+    return;
+  }
+
+  // Check if Firebase is initialized
+  if (!firestoreDb) {
+    toast.error("Database not initialized. Please try again later.");
+    return;
+  }
+
+  toast.info("Uploading image and creating your token...");
+
+  try {
+    // Upload image and get metadata
+    const metadataResponse = await uploadImageToIPFS();
+    if (!metadataResponse) {
+      throw new Error("Failed to create metadata");
+    }
+
+    // Validate the metadata response has the expected properties
+    if (!metadataResponse.metadataUri) {
+      throw new Error("Invalid metadata response from IPFS - missing metadataUri");
+    }
+
+    console.log("IPFS response:", metadataResponse); // Add this for debugging
+
+    const mintKeypair = Keypair.generate();
+    const mintAddress = mintKeypair.publicKey.toString();
+
+    const response = await fetch("https://pumpportal.fun/api/trade-local", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        publicKey: publicKey.toString(),
+        action: "create",
+        tokenMetadata: {
+          name: metadataResponse.metadata?.name || formState.name,
+          symbol: metadataResponse.metadata?.symbol || formState.symbol,
+          uri: metadataResponse.metadataUri
+        },
+        mint: mintKeypair.publicKey.toString(),
+        denominatedInSol: "true",
+        amount: formState.amount,
+        slippage: formState.slippage,
+        priorityFee: formState.priorityFee,
+        pool: "pump",
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Failed to generate transaction: ${errorText}`);
+    }
+    
+    const txData = await response.arrayBuffer();
+    const tx = (
+      await import("@solana/web3.js")
+    ).VersionedTransaction.deserialize(new Uint8Array(txData));
+
+    tx.sign([mintKeypair]);
+    const signedTx = await signTransaction(tx);
+
+    const connection = new (await import("@solana/web3.js")).Connection(
+      "https://mainnet.helius-rpc.com/?api-key=fb5ef076-69e7-4d96-82d8-2237c13aef7a",
+      "confirmed"
+    );
+    
+    try {
+      const signature = await connection.sendRawTransaction(
+        signedTx.serialize()
+      );
+      
+      console.log("Transaction signature:", signature);
+      
+      // Create token data object for Firebase with fallback values for any missing fields
+      const tokenData = {
+        name: metadataResponse.metadata?.name || formState.name,
+        symbol: metadataResponse.metadata?.symbol || formState.symbol,
+        description: metadataResponse.metadata?.description || formState.description,
+        imageUrl: metadataResponse.metadata?.image || "", // Set empty string as fallback
+        metadataUrl: metadataResponse.metadataUri,
+        mintAddress: mintAddress,
+        transactionSignature: signature,
+        creatorWallet: publicKey.toString(),
+        createdAt: new Date().toISOString(),
+        twitter: formState.twitter || null,
+        telegram: formState.telegram || null,
+        website: formState.website || null,
+      };
+      
+      // Validate that required fields exist before saving
+      if (!tokenData.imageUrl) {
+        console.warn("Image URL is missing in the response, using placeholder");
+        tokenData.imageUrl = "placeholder-image-url"; // Provide a placeholder or default URL
+      }
+      
+      // Save to Firebase
+      const saved = await saveTokenToFirebase(tokenData);
+      
+      if (!saved) {
+        toast.warning("Token created but metadata couldn't be saved to database");
+      }
+
+      // Close the modal first
+      onClose();
+      
+      // Show success toast
+      toast.success("Token created successfully!");
+      
+      // No need to reload the page - let the success message show
+    } catch (txError) {
+      // Try to get the logs if available
+      const logs = txError.logs || [];
+      console.error("Transaction logs:", logs);
+      
+      // Check for specific error messages
+      if (logs.some(log => log.includes("Symbol too long"))) {
+        throw new Error("Symbol too long. Please use 10 characters or less.");
+      } else {
+        throw txError;
+      }
+    }
+  } catch (err) {
+    console.error("Error:", err);
+    toast.error(`Error: ${err.message}`);
+    setError(err.message);
+  }
+};
   return (
     <Dialog
       open={isOpen}
