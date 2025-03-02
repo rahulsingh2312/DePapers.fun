@@ -1,9 +1,16 @@
 "use client"
 import { useEffect, useState } from "react";
 import axios from "axios";
-import Image from "next/image";
+// import Image from "next/image";
 const FetchPumpFunCoins = () => {
-  const [coins, setCoins] = useState<any[]>([]);
+  interface Coin {
+    image_uri: string;
+    name: string;
+    symbol: string;
+    usd_market_cap: number;
+  }
+  
+  const [coins, setCoins] = useState<Coin[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -12,8 +19,8 @@ const FetchPumpFunCoins = () => {
       try {
         const response = await axios.get("https://frontend-api-v3.pump.fun/coins/currently-live", {
           params: {
-            limit: 18,
-            offset: 0,
+            limit: 10,
+            offset: 1,
             includeNsfw : false, // Ensure only complete coins are fetched
           },
         });
@@ -22,7 +29,7 @@ const FetchPumpFunCoins = () => {
 
         setCoins(filteredCoins);
       } catch (err) {
-        setError("Error fetching data");
+        setError(`Error fetching data: ${err}`);
       } finally {
         setLoading(false);
       }

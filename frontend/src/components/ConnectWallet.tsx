@@ -4,7 +4,7 @@ import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 
 const ConnectWallet = () => {
   return (
-    <div className="">
+    <div className="max-w-34">
       <WalletMultiButton className="" />
     </div>
   );
