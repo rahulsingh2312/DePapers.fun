@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/app/firebase'; // Adjust path as needed
-import { SiSolana } from 'react-icons/si';
+// import { SiSolana } from 'react-icons/si';
 
 const TokenDetail = () => {
   const { slugId } = useParams(); // Get the dynamic slugId from URL

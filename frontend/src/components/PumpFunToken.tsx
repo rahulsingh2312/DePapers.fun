@@ -100,21 +100,21 @@ const TokenDisplay = () => {
 
     fetchTokens();
     //console log tokens token.mintAddress
-  }, []);
+  }, [tokens]);
 
-  const formatPrice = (price) => {
-    if (price === "N/A") return "N/A";
+  // const formatPrice = (price) => {
+  //   if (price === "N/A") return "N/A";
 
-    // Convert string to number and format based on value
-    const numPrice = parseFloat(price);
-    if (isNaN(numPrice)) return "N/A";
+  //   // Convert string to number and format based on value
+  //   const numPrice = parseFloat(price);
+  //   if (isNaN(numPrice)) return "N/A";
 
-    if (numPrice < 0.000001) {
-      return numPrice.toExponential(6);
-    }
+  //   if (numPrice < 0.000001) {
+  //     return numPrice.toExponential(6);
+  //   }
 
-    return numPrice.toFixed(8);
-  };
+  //   return numPrice.toFixed(8);
+  // };
 
   if (loading)
     return (
