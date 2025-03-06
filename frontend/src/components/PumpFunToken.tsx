@@ -89,8 +89,8 @@ const TokenDisplay = () => {
         );
 
         setTokens(tokensWithData);
-        console.log(tokensWithData);
-        console.log(tokens);
+        // console.log(tokensWithData);
+        // console.log(tokens);
       } catch (err) {
         setError(`Error fetching data: ${err.message}`);
       } finally {
@@ -133,10 +133,10 @@ const TokenDisplay = () => {
   return (
     <div className=" mx-5 px-4 py-8">
       <h2 className="text-4xl font-light mb-8 flex items-center">
+        <img src="logov1.png" className="h-12 rounded-xl border-orange-300 border mr-2 shadow-sm" alt="" />
         <span className="bg-gradient-to-br max-sm:text-xl from-black to-[#966300] bg-clip-text text-transparent">
           Tokenized Papers
         </span>
-        <SiSolana className="text-[#966300] ml-2 max-sm:text-xl" />
       </h2>
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 max-[673px]:grid-cols-1">

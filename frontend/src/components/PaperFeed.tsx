@@ -11,7 +11,6 @@ const PaperFeed = () => {
           <h1 className="font-medium text-4xl text-center mt-9">
             depapers.fun
           </h1>
-          <IoMdInformationCircleOutline className="text-xl cursor-pointer" title="How it works?" />
         </div>
         <div className="flex items-center justify-left mt-4">
           <input
