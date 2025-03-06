@@ -1,4 +1,3 @@
-import { IoMdInformationCircleOutline } from "react-icons/io";
 
 const PaperFeed = () => {
   return (
