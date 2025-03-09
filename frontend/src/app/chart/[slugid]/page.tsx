@@ -56,7 +56,7 @@ const TokenTradingChart = () => {
         const now = Math.floor(Date.now() / 1000);
         const twoDaysAgo = now - 48 * 60 * 60; // 48 hours ago
         // const apiUrl = `     https://datapi.jup.ag/v1/charts/9d9mb8kooFfaD3SctgZtkxQypkshx6ezhbKio89ixyy2?interval=15_MINUTE&baseAsset=${TOKEN_ID}&from=1740859396000&to=1741129396000&candles=301&type=price`;
-        const apiUrl = `https://datapi.jup.ag/v1/charts/${assetId}?interval=${interval}&baseAsset=${TOKEN_ID}&from=${twoDaysAgo * 1000}&to=${now * 1000}&candles=300&type=price`;
+        const apiUrl = `https://datapi.jup.ag/v1/charts/${assetId}?interval=${interval}&baseAsset=${TOKEN_ID}&from=${twoDaysAgo * 1000}&to=${now * 1000}&candles=300&type=mcap`;
         const response = await fetch(apiUrl);
         const data = await response.json();
 
