@@ -142,7 +142,7 @@ const TokenDisplay = () => {
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 max-[673px]:grid-cols-1">
         {tokens.map((token) => (
           <Link
-            href={`/token/${token.id}`}
+            href={`/token/${token.mintAddress}`}
             className="block hover:shadow-2xl hover:border-yellow-400 hover:bg-yellow-200 bg-white p-2 border border-yellow-200 rounded-lg transition-shadow "
             key={token.id}
           >
