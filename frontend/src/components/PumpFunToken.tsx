@@ -35,7 +35,7 @@ const TokenDisplay = () => {
               if (token.mintAddress) {
                 try {
                   const priceResponse = await fetch(
-                    `https://api.jup.ag/price/v2?ids=${token.mintAddress}&showExtraInfo=true`
+                    `https://api.jup.ag/price/v2?ids=${token.mintAddress}&showExtraInfo=false`
                   );
 
                   if (priceResponse.ok) {
@@ -100,7 +100,7 @@ const TokenDisplay = () => {
 
     fetchTokens();
     //console log tokens token.mintAddress
-  }, [tokens]);
+  }, []);
 
   // const formatPrice = (price) => {
   //   if (price === "N/A") return "N/A";
@@ -147,8 +147,8 @@ const TokenDisplay = () => {
             key={token.id}
           >
             <div className="border border-gray-200 rounded-lg bg-yellow-100 flex overflow-hidden">
-              <div className=" relative">
-                {token.imageUrl ? (
+              <div className="w-1/3 flex items-center justify-center mx-auto relative">
+                {token.imageUrl || token.metadata?.image ? (
                   <Image
                     src={token.metadata?.image || token.imageUrl}
                     alt={token.name}
@@ -160,7 +160,7 @@ const TokenDisplay = () => {
                   <SiSolana className="text-6xl text-gray-300 mx-auto mt-10" />
                 )}
               </div>
-              <div className="p-4">
+              <div className="w-[60%] p-4">
                 <h3 className="text-xl font-medium">{token.name}</h3>
                 <p className="text-gray-600 text-sm line-clamp-2">
                   {token.description || "No description"}
@@ -170,14 +170,14 @@ const TokenDisplay = () => {
               
             </div>
             <div className="p-2 flex justify-between items-center">
-                  <Link
-                    href={`https://solscan.io/token/${token.mintAddress}`}
+                  <a
+                    href={`https://gmgn.ai/sol/token/KWeg5qLI_${token.mintAddress}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-yellow-600 hover:underline text-sm"
                   >
-                    Solscan 
-                  </Link>
+                    Trade 
+                  </a>
                   <p className="text-sm w-fit font-medium py-1 px-2 bg-green-300 text-green-700 border rounded-lg border-green-400">Price: {token.price ? `$${token.price}` : "N/A"}</p>
                 </div>
           </Link>

@@ -432,7 +432,11 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
             onChange={handleChange}
             className="w-full p-3 bg-gray-50 border border-gray-300 rounded text-gray-800 font-serif shadow-sm focus:ring-2 focus:ring-amber-200 focus:border-amber-400 focus:outline-none"
             required
+            maxLength={10}
           />
+           <p className="text-xs text-gray-500 mt-1">
+              {formState.symbol.length}/10 characters 
+            </p>
           
           <div>
             <input

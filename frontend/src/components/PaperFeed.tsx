@@ -3,7 +3,7 @@ const PaperFeed = () => {
   return (
     <div className="mx-10">
       <p className="text-gray-600 font-medium">
-        2k+ Papers Minted and counting
+        1+ Papers Minted and counting
       </p>
       <div className=" border-t-2 border-gray-800/20 pb-10">
         <div className="flex gap-2 items-center justify-left">
