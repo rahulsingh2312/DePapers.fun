@@ -7,6 +7,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/app/firebase'; // Adjust path as needed
 import { createChart, LineSeries } from 'lightweight-charts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { toast } from 'sonner';
 
 const TokenDetail = () => {
   const { slugId } = useParams(); // Get the dynamic slugId from URL
@@ -27,7 +28,18 @@ const TokenDetail = () => {
   const [profitLoss, setProfitLoss] = useState(null);
   const chartInstance = useRef(null);
   const seriesInstance = useRef(null);
+// Author's wallet address for tips
+const authorWalletAddress = "4iG4s2F3eSByCkMvfsGhrvzXNoPrDFUJuA7Crtuf3Pvn"
 
+// Handle tip author click
+const handleTipAuthor = (e ) => {
+  e.preventDefault();
+  navigator.clipboard.writeText(authorWalletAddress);
+  toast.success("Wallet address copied to clipboard!", {
+    description: "Thank you for supporting the author!",
+    duration: 3000,
+  });
+};
   // Fetch token details from Firestore
   useEffect(() => {
     if (!slugId) return;
@@ -236,7 +248,13 @@ const TokenDetail = () => {
     <div className="container mx-auto p-6">
       {/* Token Basic Information */}
       <div className="mb-8">
+     
+     <div className='flex items-center justify-between gap-4'>
         <h1 className="text-3xl font-bold">{token.name}</h1>
+        <h1 className=" font-bold flex items-center justify-center "><a target='_blank' className='underline text-xl  text-yellow-600 mx-5' href={`${token?.website}`}>Read the paper!</a>
+        <div onClick={handleTipAuthor}  className='text-sm'>tip the author</div>
+        </h1>
+        </div>
         <div className="flex items-center gap-4 mt-4">
           {token.imageUrl && (
             <Image
