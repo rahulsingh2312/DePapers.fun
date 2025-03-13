@@ -133,7 +133,7 @@ const TokenDisplay = () => {
   return (
     <div className=" mx-5 px-4 py-8">
       <h2 className="text-4xl font-light mb-8 flex items-center">
-        <img src="logov1.png" className="h-12 rounded-xl border-orange-300 border mr-2 shadow-sm" alt="" />
+        <Image src="logov1.png" className="h-12 rounded-xl border-orange-300 border mr-2 shadow-sm" alt="" />
         <span className="bg-gradient-to-br max-sm:text-xl from-black to-[#966300] bg-clip-text text-transparent">
           Tokenized Papers
         </span>
