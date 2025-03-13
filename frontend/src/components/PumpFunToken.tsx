@@ -133,7 +133,9 @@ const TokenDisplay = () => {
   return (
     <div className=" mx-5 px-4 py-8">
       <h2 className="text-4xl font-light mb-8 flex items-center">
-        <Image src="logov1.png" className="h-12 rounded-xl border-orange-300 border mr-2 shadow-sm" alt="" />
+        <Image  alt="logo"
+        width={40}
+        height={30} src="/logov1.png" className="h-12 rounded-xl border-orange-300 border mr-2 shadow-sm"  />
         <span className="bg-gradient-to-br max-sm:text-xl from-black to-[#966300] bg-clip-text text-transparent">
           Tokenized Papers
         </span>
@@ -142,7 +144,7 @@ const TokenDisplay = () => {
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 max-[673px]:grid-cols-1">
         {tokens.map((token) => (
           <Link
-            href={`/token/${token.mintAddress}`}
+            href={`/token/${token.id}`}
             className="block hover:shadow-2xl hover:border-yellow-400 hover:bg-yellow-200 bg-white p-2 border border-yellow-200 rounded-lg transition-shadow "
             key={token.id}
           >
