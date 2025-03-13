@@ -6,9 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useParams } from 'next/navigation';
 
 
-const TokenTradingChart = () => {
+const TokenTradingChart = ({tokenAddress}) => {
   const { slugid } = useParams(); // Get the dynamic slugId from URL
-  const TOKEN_ID = slugid ;
+  const TOKEN_ID = tokenAddress ;
+  console.log(TOKEN_ID);
   console.log(TOKEN_ID);
   const [name, setName] = useState(null);
   const [mkc, setMkc] = useState(null);
@@ -158,7 +159,7 @@ const TokenTradingChart = () => {
   }, [TOKEN_ID]);
 
   return (
-    <Card className="w-full max-w-4xl mx-auto my-5">
+    <Card className="w-6/12 justify-center flex flex-col max-w-4xl mx-auto my-5">
       <CardHeader>
         <CardTitle>Token Trading Chart</CardTitle>
         <p className={`mt-2 text-lg font-bold ${profitLoss >= 0 ? 'text-green-500' : 'text-red-500'}`}>
