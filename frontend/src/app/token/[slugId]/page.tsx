@@ -214,11 +214,11 @@ const handleTipAuthor = (e ) => {
     fetch(`https://datapi.jup.ag/v1/pools?assetIds=${TOKEN_ID}`)
       .then((res) => res.json())
       .then((data) => {
-        if (data.pools && data.pools.length > 0) {
-          setPool(data.pools[0]);
-          setProfitLoss(data.pools[0].baseAsset.stats24h.priceChange);
-          setName(data.pools[0].baseAsset.name);
-          setMkc(data.pools[0].baseAsset.mcap);
+        if (data?.pools && data?.pools.length > 0) {
+          setPool(data?.pools[0]);
+          setProfitLoss(data.pools[0].baseAsset.stats24h?.priceChange);
+          setName(data.pools[0].baseAsset?.name);
+          setMkc(data.pools[0].baseAsset?.mcap);
         }
       })
       .catch((err) => setError(err.message));
