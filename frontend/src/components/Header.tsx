@@ -34,7 +34,7 @@ const Header = () => {
                 <FaTimes />
               </div>
             </div>
-              <Image src="howitworks.png" alt="" />
+              <Image src="/howitworks.png" width={1000} height={1000} alt="" />
           </div>
         </div>
       )}
