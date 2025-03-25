@@ -423,7 +423,9 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+        contact @depapersol on twitter for more info
+
+        {/* <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <input
             type="text"
             name="name"
@@ -492,7 +494,6 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
             className="w-full p-3 bg-gray-50 border border-gray-300 rounded text-gray-800 font-serif shadow-sm focus:ring-2 focus:ring-amber-200 focus:border-amber-400 focus:outline-none"
           />
           
-          {/* File upload section */}
           <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
             <div className="space-y-2">
               <div className="flex items-center justify-center">
@@ -585,7 +586,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
               {isUploading ? "Uploading..." : "Publish Token"}
             </button>
           </div>
-        </form>
+        </form> */}
       </DialogPanel>
     </Dialog>
   );
