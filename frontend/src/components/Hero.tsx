@@ -425,7 +425,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 
         contact @depapersol on twitter for more info
 
-        {/* <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+        <form onSubmit={handleSubmit} className="mt-6 hidden space-y-4">
           <input
             type="text"
             name="name"
@@ -586,7 +586,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
               {isUploading ? "Uploading..." : "Publish Token"}
             </button>
           </div>
-        </form> */}
+        </form>
       </DialogPanel>
     </Dialog>
   );
