@@ -249,12 +249,12 @@ const TokenDetail = () => {
     const TOKEN_ID = token.mintAddress;
     let cancelled = false;
 
-    const useMock = () => {
+    const applyMock = () => {
       if (!cancelled) setChartData(mockChartData(TOKEN_ID, interval));
     };
 
     if (assetId === "__mock__") {
-      useMock();
+      applyMock();
       return () => {
         cancelled = true;
       };
@@ -279,11 +279,11 @@ const TokenDetail = () => {
           }));
           setChartData(formattedData);
         } else {
-          useMock();
+          applyMock();
         }
       } catch (err) {
         console.warn("Chart data unavailable:", err.message);
-        useMock();
+        applyMock();
       }
     };
 
@@ -618,7 +618,13 @@ console.log(name)
                       }`}
                       target="_blank"
                       rel="noopener noreferrer" className="flex items-center w-fit gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
-                      <img src="/gmgnlogo.png" alt="" className="h-6 rounded-full" />
+                      <Image
+                        src="/gmgnlogo.png"
+                        alt=""
+                        width={24}
+                        height={24}
+                        className="h-6 w-6 rounded-full"
+                      />
                       Trade Paper
                     </a>
                   </div>
