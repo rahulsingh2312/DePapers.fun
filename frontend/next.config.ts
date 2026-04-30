@@ -1,14 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  turbopack: {
+    root: __dirname,
+  },
   images: {
-    domains: [
-      'pbs.twimg.com',
-      'ipfs.io',
-      'cloudflare-ipfs.com',
-      'arweave.net',
-      'ipfs-gateway.cloud',
-    ],
     remotePatterns: [
       {
         protocol: 'https',
